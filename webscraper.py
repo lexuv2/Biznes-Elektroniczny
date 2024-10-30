@@ -5,16 +5,20 @@ import os
 from urllib.parse import urljoin
 
 base_url = 'https://biferno.pl'
-image_dir = './data-images'
+data_dir = 'data'
+image_dir = os.path.join(data_dir, 'images')
 
 class Scraper:
+    def __init__(self):
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+        if not os.path.exists(image_dir):
+            os.makedirs(image_dir)
+
+
     def get_page_content(self, url):
         response = requests.get(url, timeout=5)
         content = BeautifulSoup(response.content, "html.parser")
-        content2 = response.content
-
-        with open('page_content.html', 'wb') as file:
-            file.write(content2)
 
         categories = self.get_categories(content, base_url)
         #print(json.dumps(categories, indent=4, ensure_ascii=False))
@@ -133,7 +137,37 @@ class Scraper:
 
         product_details['other_qualities'] = other_details
 
+        images = self.get_product_images(content, product_name)
+        product_details['images'] = images
+        print(json.dumps(product_details, indent=4, ensure_ascii=False))
+
         return product_details
+    
+    def get_product_images(self, content, product_name):
+        images = []
+        image_divs = content.find_all('div', class_='mainimg productdetailsimgsize row')
+        for index in [0, 2]:  
+            if index < len(image_divs):
+                img_tag = image_divs[index].find('img')
+                if img_tag and img_tag['src']:
+                    img_url = urljoin(base_url, img_tag['src'])
+                    alt_text = img_tag.get('alt', product_name).replace(' ', '_')
+                    local_path = os.path.join(image_dir, f"{alt_text}_{index}.jpg").replace('\\', '/')
+                    self.download_image(img_url, local_path)
+                    images.append({
+                        "url": img_url,
+                        "local_path": local_path
+                    })
+        return images
+    
+    def download_image(self, img_url, local_path):
+        if not os.path.exists(image_dir):
+            os.makedirs(image_dir)
+        response = requests.get(img_url, stream=True)
+        if response.status_code == 200:
+            with open(local_path, 'wb') as file:
+                for chunk in response:
+                    file.write(chunk)
 
 if __name__ == '__main__':
     scraper = Scraper()
