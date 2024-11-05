@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import json
 import os
+import re
 from urllib.parse import urljoin
 
 base_url = 'https://biferno.pl'
@@ -111,7 +112,7 @@ class Scraper:
         content = BeautifulSoup(product_content.content, "html.parser")
         product_details = {}
 
-        product_name = product_name = content.find('h1', class_='name').text.strip()
+        product_name = content.find('h1', class_='name').text.strip()
         product_details['product_name'] = product_name
         
         product_price = content.find('em', class_='main-price').text.strip()
@@ -139,35 +140,42 @@ class Scraper:
 
         images = self.get_product_images(content, product_name)
         product_details['images'] = images
-        print(json.dumps(product_details, indent=4, ensure_ascii=False))
+        #print(json.dumps(product_details, indent=4, ensure_ascii=False))
 
         return product_details
     
     def get_product_images(self, content, product_name):
         images = []
-        image_divs = content.find_all('div', class_='mainimg productdetailsimgsize row')
-        for index in [0, 2]:  
-            if index < len(image_divs):
-                img_tag = image_divs[index].find('img')
-                if img_tag and img_tag['src']:
-                    img_url = urljoin(base_url, img_tag['src'])
-                    alt_text = img_tag.get('alt', product_name).replace(' ', '_')
-                    local_path = os.path.join(image_dir, f"{alt_text}_{index}.jpg").replace('\\', '/')
-                    self.download_image(img_url, local_path)
+        li_elements = content.find_all('li', class_='r--l-flex r--l-flex-vcenter')
+        for index in [0, 1]:
+            if index < len(li_elements):
+                li_element = li_elements[index]
+                image_url = li_element.find('a')
+                image_url = urljoin(base_url, image_url['href'])
+                print(image_url)
+                if image_url:
+                    local_path = os.path.join(image_dir, f"{product_name}_{index}.jpg").replace('\\', '/')
+                    self.download_image(image_url, local_path)
                     images.append({
-                        "url": img_url,
+                        "url": image_url,
                         "local_path": local_path
                     })
+
+
         return images
     
     def download_image(self, img_url, local_path):
         if not os.path.exists(image_dir):
             os.makedirs(image_dir)
-        response = requests.get(img_url, stream=True)
-        if response.status_code == 200:
+        
+        try:
+            response = requests.get(img_url, stream=True)
             with open(local_path, 'wb') as file:
-                for chunk in response:
+                for chunk in response.iter_content(1024):
                     file.write(chunk)
+        except Exception as e:
+            print(f"Error downloading image: {img_url}")
+            print(e)
 
 if __name__ == '__main__':
     scraper = Scraper()
