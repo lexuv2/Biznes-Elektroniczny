@@ -61,7 +61,6 @@ class Scraper:
                     subcategory_name = subcategory.find('a').text.strip()
                     subcategory_url = urljoin(base_url, subcategory.find('a')['href'])
 
-
                     if category_name.lower() == "włóczki":
                         if "WŁÓCZKI WG GATUNKU" in subcategory_name.upper():
                             yarn_subcategories = self.get_yarn_subcategories(subcategory, base_url)
@@ -100,8 +99,10 @@ class Scraper:
     def get_products(self, subcategory_link):
         products = {}
         page_number = 1
+        product_count = 0
+        max_products = 50
 
-        while True:
+        while product_count < max_products:
             paginated_link = f"{subcategory_link}/{page_number}"
             print(f"Retrieving page {paginated_link}...")
             try:
@@ -117,10 +118,14 @@ class Scraper:
                     break
 
                 for product in products_list.find_all('div', class_='product s-grid-3 product-main-wrap'):
+                    if product_count >= max_products:
+                        break
                     product_url = urljoin(base_url, product.find('a', class_='prodimage')['href'])
                     product_details = self.get_product_details(product_url)
-                    products[product_details['product_name']] = product_details
-                    self.product_count += 1
+                    if 'product_name' in product_details:
+                        products[product_details['product_name']] = product_details
+                        self.product_count += 1
+                        product_count += 1
 
                 paginator = content.find('ul', class_='paginator')
                 if paginator:
@@ -128,7 +133,7 @@ class Scraper:
                     if last_page and not last_page.find('a'):
                         break
                 else:
-                    break  
+                    break
 
                 page_number += 1
             except requests.RequestException as e:
@@ -147,11 +152,18 @@ class Scraper:
             content = BeautifulSoup(product_content.content, "html.parser")
             product_details = {}
 
-            product_name = content.find('h1', class_='name').text.strip()
-            product_details['product_name'] = product_name
-            
-            product_price = content.find('em', class_='main-price').text.strip()
-            product_details['product_price'] = product_price
+            product_name = content.find('h1', class_='name')
+            if product_name:
+                product_details['product_name'] = product_name.text.strip()
+            else:
+                print(f"Product name not found for {product_url}")
+                return {}
+
+            product_price = content.find('em', class_='main-price')
+            if product_price:
+                product_details['product_price'] = product_price.text.strip()
+            else:
+                product_details['product_price'] = "No price available"
             
             product_description_tag = content.find('div', class_='resetcss', itemprop='description')
             product_description = product_description_tag.text.strip() if product_description_tag else "No description available"
@@ -176,7 +188,7 @@ class Scraper:
 
             product_details['other_qualities'] = other_details
 
-            images = self.get_product_images(content, product_name)
+            images = self.get_product_images(content, product_details['product_name'])
             product_details['images'] = images
 
             return product_details
