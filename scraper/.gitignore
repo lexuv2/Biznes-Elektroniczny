@@ -1,3 +1,7 @@
+# Ignorowanie plików w folderze data/images
+data/images/
+data/images.zip
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
