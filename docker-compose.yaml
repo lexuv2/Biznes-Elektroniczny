@@ -2,6 +2,8 @@ version: '3'
 services:
   mysql:
     container_name: some-mysql
+    volumes:
+      - dbdata:/var/lib/mysql
     image: mysql:5.7
     restart: unless-stopped
     environment:
@@ -28,5 +30,6 @@ services:
     networks:
       - prestashop_network
     platform: linux/x86_64 # Only for mac M1 users :)
+
 networks:
     prestashop_network:
