@@ -34,6 +34,7 @@ services:
     image: nginx:latest
     depends_on:
       - prestashop
+      - phpmyadmin
 
     # host and guest ports must be identical
     ports:
@@ -41,13 +42,27 @@ services:
       - 443:443
     volumes:
       - psdata:/var/www/html
+      - ./themes/classic:/var/www/html/themes/classic
+      - pmadata:/var/www/html/phpmyadmin
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ./certs/:/certs
+      - ./logs/nginx:/var/log/nginx
     networks:
       - prestashop_network
+  phpmyadmin:
+    image: phpmyadmin:fpm
+    depends_on:
+      - mariadb
+    networks:
+      - prestashop_network
+    volumes:
+      - pmadata:/var/www/html
+    environment:
+      PMA_HOST: mariadb
 
 volumes:
   psdata:
+  pmadata:
 
 networks:
     prestashop_network:
