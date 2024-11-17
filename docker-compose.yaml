@@ -14,24 +14,42 @@ services:
     platform: linux/x86_64 # Only for mac M1 users :)
   prestashop:
     container_name: prestashop
+    image: prestashop/prestashop:1.7.8.7-fpm
     volumes:
-      - ./prestashop:/var/www/html
-    image: prestashop/prestashop:1.7.8
+      - ./themes/classic:/var/www/html/themes/classic
+      - psdata:/var/www/html
     restart: unless-stopped
     depends_on:
       - mysql
-    ports:
-      - 8080:80
     environment:
       DB_SERVER: some-mysql
       DB_NAME: prestashop
       DB_USER: root
       DB_PASSWD: admin
       PS_INSTALL_AUTO: 1 # Auto install PrestaShop
-      PS_DOMAIN: localhost:8080 # Your domain
+      PS_ENABLE_SSL: 1
+      PS_DOMAIN: 127.0.0.1
     networks:
       - prestashop_network
     platform: linux/x86_64 # Only for mac M1 users :)
+  web:
+    image: nginx:latest
+    depends_on:
+      - prestashop
+
+    # host and guest ports must be identical
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - psdata:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./certs/:/certs
+    networks:
+      - prestashop_network
+
+volumes:
+  psdata:
 
 networks:
     prestashop_network:
