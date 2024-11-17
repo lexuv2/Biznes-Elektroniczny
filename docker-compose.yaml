@@ -1,14 +1,13 @@
-version: '3'
 services:
-  mysql:
-    container_name: some-mysql
+  mariadb:
+    container_name: mariadb
     volumes:
       - ./dbdata:/var/lib/mysql
-    image: mysql:5.7
+    image: mariadb:latest
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_DATABASE: prestashop
+      MARIADB_ROOT_PASSWORD: admin
+      MARIADB_DATABASE: prestashop
     networks:
       - prestashop_network
     platform: linux/x86_64 # Only for mac M1 users :)
@@ -20,11 +19,10 @@ services:
       - psdata:/var/www/html
     restart: unless-stopped
     depends_on:
-      - mysql
+      - mariadb
     environment:
-      DB_SERVER: some-mysql
+      DB_SERVER: mariadb
       DB_NAME: prestashop
-      DB_USER: root
       DB_PASSWD: admin
       PS_INSTALL_AUTO: 1 # Auto install PrestaShop
       PS_ENABLE_SSL: 1
