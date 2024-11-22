@@ -43,7 +43,7 @@
     <minimal_quantity><![CDATA[]]></minimal_quantity>
     <low_stock_threshold><![CDATA[]]></low_stock_threshold>
     <low_stock_alert><![CDATA[]]></low_stock_alert>
-    <price><![CDATA[]]></price>
+    <price><![CDATA[ {{product.price}}  ]]> </price>
     <wholesale_price><![CDATA[]]></wholesale_price>
     <unity><![CDATA[]]></unity>
     <unit_price_ratio><![CDATA[]]></unit_price_ratio>
