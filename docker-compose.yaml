@@ -28,6 +28,10 @@ services:
       PS_INSTALL_AUTO: 1 # Auto install PrestaShop
       PS_ENABLE_SSL: 1
       PS_DOMAIN: 127.0.0.1
+      PS_LANGUAGE: pl
+      PS_COUNTRY: PL
+      ADMIN_MAIL: admin@wloczki.pl
+      ADMIN_PASSWD: kochamwloczki
     networks:
       - prestashop_network
     platform: linux/x86_64 # Only for mac M1 users :)
