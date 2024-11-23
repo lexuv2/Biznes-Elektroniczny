@@ -50,10 +50,8 @@ global_settings:
         - ps_mainmenu
         - ps_searchbar
       displayHome:
-        - ps_imageslider
-        - ps_featuredproducts
         - ps_banner
-        - ps_customtext
+        - ps_featuredproducts
       displayFooterBefore:
         - blockreassurance
         - ps_emailsubscription
