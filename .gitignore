@@ -4,3 +4,4 @@ certs/
 dbdata/
 psdata/
 logs/
+.idea/
