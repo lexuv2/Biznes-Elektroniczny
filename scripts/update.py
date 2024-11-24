@@ -276,10 +276,10 @@ class Stock:
         """
         self.quantity = new_quantity
         response = requests.put(API_URL + f"/stock_availables/{self.id}", auth=auth, verify=False, data=self.to_xml().encode('utf-8'))
-        if response.status_code == 200:
-            print(f"Successfully updated stock quantity for ID {self.id} to {self.quantity}")
-        else:
-            print(f"Failed to update stock quantity for ID {self.id}: {response.status_code} - {response.text}")  
+        # if response.status_code == 200:
+        #     print(f"Successfully updated stock quantity for ID {self.id} to {self.quantity}")
+        # else:
+        #     print(f"Failed to update stock quantity for ID {self.id}: {response.status_code} - {response.text}")  
     
 def create(data): 
     """
@@ -383,16 +383,16 @@ if __name__ == "__main__":
         # Ładujemy dane JSON
         data = json.load(file)
 
-    updated_data = remove_80_percent_products(data)
+    # updated_data = remove_80_percent_products(data)
 
     # Zapisz zmodyfikowane dane do nowego pliku JSON
-    with open('../data/data_reduced.json', 'w', encoding='utf-8') as file:
-        json.dump(updated_data, file, ensure_ascii=False, indent=4)
+    # with open('../data/data_reduced.json', 'w', encoding='utf-8') as file:
+    #     json.dump(updated_data, file, ensure_ascii=False, indent=4)
 
     # formatted_data = format_json_with_depth(data, max_depth=6)
     # print(json.dumps(formatted_data, indent=4, ensure_ascii=False))
     
-    created_products = create(updated_data)    
+    created_products = create(data)    
     set_stocks(created_products)    
 
 
