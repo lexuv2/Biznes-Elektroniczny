@@ -7,6 +7,7 @@ import json
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader
 import random
+from pathlib import Path
 
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -27,6 +28,7 @@ TEAMPLATE_CATEOGRY = 'category.xml'
 TEMPLATE_PRODUCT = 'product.xml'
 TEMPLATE_PRODUCT_FEAUTRE = 'product_feature.xml'
 TEMPLATE_PRODUCT_FEATURE_VALUE = 'product_feature_value.xml'
+TEMPLATE_STOCK = 'stock.xml'
 
 URL_CATEGORIES = f'{API_URL}/categories'
 URL_PRODUCTS = f'{API_URL}/products'
@@ -97,7 +99,7 @@ class Product:
     A class representing a product  in the store.
     """
     template = env.get_template(TEMPLATE_PRODUCT)
-    def __init__(self, id: int, name: str, price:any, img_path: str, category: Category, description: str, product_feature_id:int,produkt_feature_value_id: int):
+    def __init__(self, id: int, name: str, price:any, img_path: list, category: Category, description: str, product_feature_id:int,produkt_feature_value_id: int):
         self.id = id
         self.name = name
         self.price = float(price.replace('\xa0zł', '').replace(',', '.'))
@@ -105,7 +107,7 @@ class Product:
         self.category = category
         self.descritpion = description
         self.product_feature_id = product_feature_id
-        self.produkt_feature_value_id = produkt_feature_value_id
+        self.produkt_feature_value_id = produkt_feature_value_id,
 
     def to_dict(self):
         """
@@ -117,6 +119,7 @@ class Product:
             "price": self.price,
             "img_path": self.img_path,
             "category": self.category.id,
+            "descritpion": self.descritpion,
             "product_feature_id": self.product_feature_id,
             "produkt_feature_value_id": self.produkt_feature_value_id
         }
@@ -132,6 +135,39 @@ class Product:
         product_data = self.to_dict()
         return Product.template.render(product=product_data)
     
+
+    def set_image(self):
+        """
+        Uploads images for the product to the API.
+        """
+        for img in self.img_path:
+            # Upewnij się, że ścieżka do obrazu jest zgodna z systemem plików
+            image_path = img.replace("\\", "/")  # Popraw dla systemów Windows/MacOS
+            if not os.path.isfile(image_path):
+                print(f"Image file {image_path} not found.")
+                continue
+            
+            # Otwórz plik obrazu w trybie binarnym
+            with open(image_path, 'rb') as img_file:
+                files = {
+                    'image': (os.path.basename(image_path), img_file, 'image/jpg')
+                }
+
+                
+                # Wysłanie żądania POST do API w celu załadowania obrazu
+                response = requests.post(
+                    f"{API_URL}/images/products/{self.id}",
+                    auth=auth,
+                    files=files,
+                    verify=False
+                )
+
+                # # Obsługa odpowiedzi
+                # if response.status_code == 200:
+                #     print(f"Successfully uploaded image for product {self.name}")
+                # else:
+                #     print(f"Failed to upload image for product {self.name}: {response.status_code} - {response.text}")
+
     def send(self):
         response = requests.post(API_URL+"/products", auth=auth, verify=False, data=self.to_xml().encode('utf-8'))
         if response.status_code == 201:
@@ -139,8 +175,8 @@ class Product:
             self.id=soup.find('id').text.strip()
             # print(f"Successfully created product with ID {self.id}")
         else:
-            # print(self.to_xml())
-            print(self.to_dict())
+            print(self.to_xml())
+            # print(self.to_dict())
             print(f"Failed to create product with ID {self.id}: {response.status_code} - {response.text}")        
 
 class Product_feature:
@@ -203,11 +239,54 @@ class Product_featur_value:
         else:
             print(f"Failed to create product feature value with ID {self.id}: {response.status_code} - {response.text}")
 
+class Stock:
+    template = env.get_template(TEMPLATE_STOCK)
+
+    def __init__(self, id: int, product: Product, quantity: int):
+        self.id = id
+        self.product = product
+        self.quantity = quantity
+
+    def to_dict(self):
+        """
+        Converts the Stock object to a dictionary.
+        """
+        return {
+            "id": self.id,
+            "product": self.product.id,
+            "quantity": self.quantity
+        }
+
+    def to_json(self):
+        """
+        Converts the Stock object to a JSON string.
+        """
+        return json.dumps(self.to_dict(), ensure_ascii=False)
+
+    def to_xml(self):
+        """
+        Generates XML for the stock using the Jinja2 template.
+        """
+        stock_data = self.to_dict()
+        return Stock.template.render(stock=stock_data)
+
+    def update_quantity(self, new_quantity: int):
+        """
+        Updates the stock quantity.
+        """
+        self.quantity = new_quantity
+        response = requests.put(API_URL + f"/stock_availables/{self.id}", auth=auth, verify=False, data=self.to_xml().encode('utf-8'))
+        if response.status_code == 200:
+            print(f"Successfully updated stock quantity for ID {self.id} to {self.quantity}")
+        else:
+            print(f"Failed to update stock quantity for ID {self.id}: {response.status_code} - {response.text}")  
+    
 def create(data): 
     """
     Creates a tree structure of categories, subcategories and products with features.
     """
     categories = []
+    products = []
     product_features = []
     product_feature_values = []
     for category_name, category_data in data.items():
@@ -221,8 +300,13 @@ def create(data):
             categories.append(sub_category)
 
             for product_name, products_data in sub_category_data.get('products', {}).items():
-                product = Product(id=1, name=product_name, price=products_data['product_price'], img_path=products_data['images'][0]['url'], category=sub_category, description=products_data['product_description'],product_feature_id=0, produkt_feature_value_id=0)
+                img = []
+                for image in products_data['images']:
+                    img.append("../"+image['local_path'])
 
+                product = Product(id=1, name=product_name, price=products_data['product_price'], img_path=img, category=sub_category, description=products_data['product_description'],product_feature_id=0, produkt_feature_value_id=0)
+
+              
                 for name_quality, qualities_data in products_data.get('other_qualities',{}).items():
                     product_feature = next((pf for pf in product_features if pf.name == name_quality), None)
                     
@@ -241,7 +325,35 @@ def create(data):
                     product.product_feature_id = product_feature.id
                     product.produkt_feature_value_id = product_feature_value.id
                     product.send()
-    
+                    products.append(product)
+                    product.set_image()
+    return products
+
+def get_stock_xml(product_id: int):
+        return requests.get(f"http://127.0.0.1/api/stock_availables?filter[id_product]={product_id}&display=full", auth=auth, verify=False).text
+
+def set_stocks(products):
+    for product in products:
+        stock_xml = get_stock_xml(product_id=product.id)
+        root = ET.fromstring(stock_xml)
+        stock_id = int(root.find("stock_availables/stock_available/id").text)
+
+        if not stock_id:
+            print(f"Stock not found for product ID {product.id}")
+            continue
+        # print(stock_id)
+
+        weights = [0.05] + [0.095] * 10
+        stock_quantity = random.choices(range(11), weights=weights, k=1)[0]  
+        stock = Stock(id=stock_id, product=product, quantity=stock_quantity)
+        # print(stock.to_xml())
+        # print(stock_quantity)
+        stock.update_quantity(new_quantity=stock_quantity)
+
+   
+
+
+
 def remove_80_percent_products(data):
     for category, category_data in data.items():
         subcategories = category_data.get('subcategories', {})
@@ -250,7 +362,7 @@ def remove_80_percent_products(data):
             product_keys = list(products.keys())
             
             # Oblicz ile produktów zostawić (20%)
-            num_to_keep = int(len(product_keys) * 0.2)
+            num_to_keep = int(len(product_keys) * 0.05)
             
             # Wybierz losowe produkty, które zostaną (20% pierwszych produktów)
             products_to_keep = random.sample(product_keys, num_to_keep)
@@ -280,6 +392,7 @@ if __name__ == "__main__":
     # formatted_data = format_json_with_depth(data, max_depth=6)
     # print(json.dumps(formatted_data, indent=4, ensure_ascii=False))
     
-    categories = create(updated_data)        
+    created_products = create(updated_data)    
+    set_stocks(created_products)    
 
 
