@@ -6,6 +6,8 @@ import urllib3
 import json
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader
+import random
+
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -19,15 +21,18 @@ Wymagania:
 
 API_URL = "https://127.0.0.1/api"
 
-TEMPLATE_DIR = "./scripts/xml_templates/"
+
+TEMPLATE_DIR = "./xml_templates/"
 TEAMPLATE_CATEOGRY = 'category.xml'
 TEMPLATE_PRODUCT = 'product.xml'
+TEMPLATE_PRODUCT_FEAUTRE = 'product_feature.xml'
+TEMPLATE_PRODUCT_FEATURE_VALUE = 'product_feature_value.xml'
 
 URL_CATEGORIES = f'{API_URL}/categories'
 URL_PRODUCTS = f'{API_URL}/products'
 
 API_KEY = os.environ.get("PRESTASHOP_KEY") # you can hardcode your api_key 
-API_KEY = "AQCQDLJ5RLC4LD4X9V9LKZM1U9PFJ82E"
+API_KEY = "L382DZUQQJBLEU9CF6S6TIEH8HVHYBQJ"
 
 env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), autoescape=True)
 auth = requests.auth.HTTPBasicAuth(API_KEY, "")
@@ -83,7 +88,7 @@ class Category:
         if response.status_code == 201:
             soup = BeautifulSoup(response.text, 'xml')
             self.id=soup.find('id').text.strip()
-            print(f"Successfully created category with ID {self.id}")
+            # print(f"Successfully created category with ID {self.id}")
         else:
             print(f"Failed to create category with ID {self.id}: {response.status_code} - {response.text}")
    
@@ -92,13 +97,15 @@ class Product:
     A class representing a product  in the store.
     """
     template = env.get_template(TEMPLATE_PRODUCT)
-    def __init__(self, id: int, name: str, price:any, img_path: str, category: Category, description: str):
+    def __init__(self, id: int, name: str, price:any, img_path: str, category: Category, description: str, product_feature_id:int,produkt_feature_value_id: int):
         self.id = id
         self.name = name
         self.price = float(price.replace('\xa0zł', '').replace(',', '.'))
         self.img_path = img_path
         self.category = category
         self.descritpion = description
+        self.product_feature_id = product_feature_id
+        self.produkt_feature_value_id = produkt_feature_value_id
 
     def to_dict(self):
         """
@@ -109,7 +116,9 @@ class Product:
             "name": self.name,
             "price": self.price,
             "img_path": self.img_path,
-            "category": self.category.id
+            "category": self.category.id,
+            "product_feature_id": self.product_feature_id,
+            "produkt_feature_value_id": self.produkt_feature_value_id
         }
     def to_json(self):
         """
@@ -122,76 +131,155 @@ class Product:
         """
         product_data = self.to_dict()
         return Product.template.render(product=product_data)
+    
     def send(self):
         response = requests.post(API_URL+"/products", auth=auth, verify=False, data=self.to_xml().encode('utf-8'))
         if response.status_code == 201:
             soup = BeautifulSoup(response.text, 'xml')
             self.id=soup.find('id').text.strip()
-            print(f"Successfully created product with ID {self.id}")
+            # print(f"Successfully created product with ID {self.id}")
         else:
-            print(self.to_xml())
+            # print(self.to_xml())
+            print(self.to_dict())
             print(f"Failed to create product with ID {self.id}: {response.status_code} - {response.text}")        
 
 class Product_feature:
-    """
-    A class representing products feature.
-    """
-    def __init__(self, id: int , name: str):
+    template = env.get_template(TEMPLATE_PRODUCT_FEAUTRE)
+
+    def __init__(self, id: int, name: str):
         self.id = id
         self.name = name
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name
+        }
+
+    def to_json(self):
+        return json.dumps(self.to_dict(), ensure_ascii=False)
+
+    def to_xml(self):
+        product_feature_data = self.to_dict()
+        return Product_feature.template.render(product_feature=product_feature_data)
+
+    def send(self):
+        response = requests.post(API_URL + "/product_features", auth=auth, verify=False, data=self.to_xml().encode('utf-8'))
+        if response.status_code == 201:
+            soup = BeautifulSoup(response.text, 'xml')
+            self.id = soup.find('id').text.strip()
+            # print(f"Successfully created product feature with ID {self.id}")
+        else:
+            print(f"Failed to create product feature with ID {self.id}: {response.status_code} - {response.text}")
+
 class Product_featur_value:
-    """
-    A class representig value of product feature
-    """
-    def __init__(self, id: int , value: str, feature: Product_feature):
+    template = env.get_template(TEMPLATE_PRODUCT_FEATURE_VALUE)
+
+    def __init__(self, id: int, value: str, product_feature: Product_feature):
         self.id = id
         self.value = value
-        self.featue = feature
+        self.product_feature = product_feature
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "value": self.value,
+            "product_feature": self.product_feature.id
+        }
+
+    def to_json(self):
+        return json.dumps(self.to_dict(), ensure_ascii=False)
+
+    def to_xml(self):
+        product_feature_value_data = self.to_dict()
+        return Product_featur_value.template.render(product_feature_value=product_feature_value_data)
+
+    def send(self):
+        response = requests.post(API_URL + "/product_feature_values", auth=auth, verify=False, data=self.to_xml().encode('utf-8'))
+        if response.status_code == 201:
+            soup = BeautifulSoup(response.text, 'xml')
+            self.id = soup.find('id').text.strip()
+            # print(f"Successfully created product feature value with ID {self.id}")
+        else:
+            print(f"Failed to create product feature value with ID {self.id}: {response.status_code} - {response.text}")
 
 def create(data): 
     """
     Creates a tree structure of categories, subcategories and products with features.
     """
     categories = []
+    product_features = []
+    product_feature_values = []
     for category_name, category_data in data.items():
         category = Category(id=-1, id_parent=2, name=category_name)
         category.send()
         categories.append(category)
-
+       
         for sub_category_name, sub_category_data in category_data.get('subcategories', {}).items():
             sub_category = Category(id=len(categories)+3, id_parent=category.id, name=sub_category_name)
             sub_category.send()
             categories.append(sub_category)
+
             for product_name, products_data in sub_category_data.get('products', {}).items():
-                # print(product_name)
-                # create_products_for_category(category=sub_category, products=products_data)
-                product = Product(id=1, name=product_name, price=products_data['product_price'], img_path=products_data['images'][0]['url'], category=sub_category, description=products_data['product_description'])
-                print(product.to_json())
-                product.send()
+                product = Product(id=1, name=product_name, price=products_data['product_price'], img_path=products_data['images'][0]['url'], category=sub_category, description=products_data['product_description'],product_feature_id=0, produkt_feature_value_id=0)
+
+                for name_quality, qualities_data in products_data.get('other_qualities',{}).items():
+                    product_feature = next((pf for pf in product_features if pf.name == name_quality), None)
+                    
+                    if not product_feature:
+                        product_feature = Product_feature(id=1, name=name_quality)
+                        product_feature.send()
+                        product_features.append(product_feature)  # Add to the list
+
+                    product_feature_value = next((pfv for pfv in product_feature_values 
+                                                 if pfv.value == qualities_data), None)
+                    
+                    if not product_feature_value:
+                        product_feature_value = Product_featur_value(id=1, value=qualities_data, product_feature=product_feature)
+                        product_feature_value.send()
+                        product_feature_values.append(product_feature_value)  
+                    product.product_feature_id = product_feature.id
+                    product.produkt_feature_value_id = product_feature_value.id
+                    product.send()
     
+def remove_80_percent_products(data):
+    for category, category_data in data.items():
+        subcategories = category_data.get('subcategories', {})
+        for subcategory, subcategory_data in subcategories.items():
+            products = subcategory_data.get('products', {})
+            product_keys = list(products.keys())
+            
+            # Oblicz ile produktów zostawić (20%)
+            num_to_keep = int(len(product_keys) * 0.2)
+            
+            # Wybierz losowe produkty, które zostaną (20% pierwszych produktów)
+            products_to_keep = random.sample(product_keys, num_to_keep)
+            
+            # Usuń produkty, które nie zostały wybrane
+            for product_key in product_keys:
+                if product_key not in products_to_keep:
+                    del products[product_key]
+            
+            # Zaktualizuj produkty w podkategorii
+            subcategory_data['products'] = products
 
-def create_products_for_category(category: Category, products):
-    """
-    products jest obiektem przechowującym wszystkie dane trzeba sparsowac, na podstawie "images" wyciagnac z niego sciezke img oraz na podstawie "other_qualities" tworzyć product_features (trzeba sprawdzić czy juz nie zostaly wczesniej takie stworzone product_features i product_feature_values)
-    """
-    ## iterate over products dictionary
-    for product_data in products.items():
-        print(product_data)
-
-    # product = Product(id=-1, name=products['product_name'], price=products['price'], img_path=products['images'][0], category=category, description=products['description'])
-    # print(product.to_json())
-    
-
+    return data
 
 if __name__ == "__main__": 
-    with open('./data/data.json', 'r',encoding='utf-8') as file:
+ # Otwieramy plik w trybie odczytu
+    with open('../data/data.json', 'r', encoding='utf-8') as file:
+        # Ładujemy dane JSON
         data = json.load(file)
+
+    updated_data = remove_80_percent_products(data)
+
+    # Zapisz zmodyfikowane dane do nowego pliku JSON
+    with open('../data/data_reduced.json', 'w', encoding='utf-8') as file:
+        json.dump(updated_data, file, ensure_ascii=False, indent=4)
 
     # formatted_data = format_json_with_depth(data, max_depth=6)
     # print(json.dumps(formatted_data, indent=4, ensure_ascii=False))
     
-    categories = create(data)        
-
+    categories = create(updated_data)        
 
 
