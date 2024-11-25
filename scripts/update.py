@@ -322,11 +322,11 @@ def create(data):
                         product_feature_value = Product_featur_value(id=1, value=qualities_data, product_feature=product_feature)
                         product_feature_value.send()
                         product_feature_values.append(product_feature_value)  
-                    product.product_feature_id = product_feature.id
-                    product.produkt_feature_value_id = product_feature_value.id
-                    product.send()
-                    products.append(product)
-                    product.set_image()
+                product.product_feature_id = product_feature.id
+                product.produkt_feature_value_id = product_feature_value.id
+                product.send()
+                products.append(product)
+                product.set_image()
     return products
 
 def get_stock_xml(product_id: int):
@@ -349,9 +349,6 @@ def set_stocks(products):
         # print(stock.to_xml())
         # print(stock_quantity)
         stock.update_quantity(new_quantity=stock_quantity)
-
-   
-
 
 
 def remove_80_percent_products(data):
@@ -385,12 +382,10 @@ if __name__ == "__main__":
 
     # updated_data = remove_80_percent_products(data)
 
-    # Zapisz zmodyfikowane dane do nowego pliku JSON
+    # # Zapisz zmodyfikowane dane do nowego pliku JSON
     # with open('../data/data_reduced.json', 'w', encoding='utf-8') as file:
     #     json.dump(updated_data, file, ensure_ascii=False, indent=4)
 
-    # formatted_data = format_json_with_depth(data, max_depth=6)
-    # print(json.dumps(formatted_data, indent=4, ensure_ascii=False))
     
     created_products = create(data)    
     set_stocks(created_products)    
