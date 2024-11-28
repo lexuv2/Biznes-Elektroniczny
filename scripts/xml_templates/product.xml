@@ -1,0 +1,33 @@
+<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
+    <product>
+        <id_category_default><![CDATA[{{ product.category.id }}]]></id_category_default>
+        <id_shop_default><![CDATA[1]]></id_shop_default>
+        <name>
+            <language id="3"><![CDATA[{{ product.name }}]]></language>
+        </name>
+        <description>
+            <language id="3"><![CDATA[{{ product.description }}]]></language>
+        </description>
+        <price><![CDATA[{{ product.price }}]]></price>
+        <active>1</active>
+          <minimal_quantity>1</minimal_quantity>
+        <additional_delivery_times>1</additional_delivery_times>
+        <available_for_order>1</available_for_order>
+        <show_price>1</show_price>
+        <state>1</state>
+        <weight>0.5</weight>
+        <associations>
+            <categories>
+                <category>
+                    <id><![CDATA[{{ product.category }}]]></id>
+                </category>
+            </categories>
+            <product_features>
+              <product_feature>
+                <id><![CDATA[{{product.product_feature_id}}]]></id>
+                <id_feature_value><![CDATA[{{product.product_feature_value_id}}]]></id_feature_value>
+              </product_feature>
+            </product_features>
+        </associations>
+    </product>
+</prestashop>

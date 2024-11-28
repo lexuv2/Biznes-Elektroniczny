@@ -1,0 +1,7 @@
+<prestashop xmlns:xlink="http://www.w3.org/1999/xlink">
+  <product_feature>
+    <name>
+      <language id="3"><![CDATA[{{product_feature.name}}]]></language>
+    </name>
+  </product_feature>
+</prestashop>
