@@ -1,18 +1,18 @@
 <?php
-/* Smarty version 3.1.43, created on 2024-11-21 23:17:21
+/* Smarty version 3.1.43, created on 2024-11-30 12:22:55
   from '/var/www/html/modules/dashactivity/views/templates/hook/dashboard_zone_one.tpl' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.43',
-  'unifunc' => 'content_673fb1711b93d5_60268738',
+  'unifunc' => 'content_674af58f2204b0_54368009',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     'f585ab9feec9345ae68f5e5f624ce435d16c2d08' => 
     array (
       0 => '/var/www/html/modules/dashactivity/views/templates/hook/dashboard_zone_one.tpl',
-      1 => 1732226168,
+      1 => 1732961289,
       2 => 'file',
     ),
   ),
@@ -20,7 +20,7 @@ if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   array (
   ),
 ),false)) {
-function content_673fb1711b93d5_60268738 (Smarty_Internal_Template $_smarty_tpl) {
+function content_674af58f2204b0_54368009 (Smarty_Internal_Template $_smarty_tpl) {
 ?><section id="dashactivity" class="panel widget<?php if ($_smarty_tpl->tpl_vars['allow_push']->value) {?> allow_push<?php }?>">
 	<div class="panel-heading">
 		<i class="icon-time"></i> <?php echo call_user_func_array( $_smarty_tpl->smarty->registered_plugins[Smarty::PLUGIN_FUNCTION]['l'][0], array( array('s'=>'Activity overview','d'=>'Modules.Dashactivity.Admin'),$_smarty_tpl ) );?>
