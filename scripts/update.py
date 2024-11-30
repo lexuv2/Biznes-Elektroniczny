@@ -34,7 +34,7 @@ URL_CATEGORIES = f'{API_URL}/categories'
 URL_PRODUCTS = f'{API_URL}/products'
 
 API_KEY = os.environ.get("PRESTASHOP_KEY") # you can hardcode your api_key 
-API_KEY = "4JUYGWQ4HJ5IEXCFG9GAQIQ5PIQSNSE2"
+API_KEY = "Y8QUQYAVU8W5P2NNQ8S6IHYC7KNE351U"
 
 env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), autoescape=True)
 auth = requests.auth.HTTPBasicAuth(API_KEY, "")
@@ -99,7 +99,7 @@ class Product:
     A class representing a product  in the store.
     """
     template = env.get_template(TEMPLATE_PRODUCT)
-    def __init__(self, id: int, name: str, price:any, img_path: list, category: Category, description: str, product_feature_id:int,product_feature_value: int):
+    def __init__(self, id: int, name: str, price:any, img_path: list, category: Category, description: str, product_feature_id:int,product_feature_value_id: int):
         self.id = id
         self.name = name
         self.price = float(price.replace('\xa0zł', '').replace(',', '.'))
@@ -107,7 +107,7 @@ class Product:
         self.category = category
         self.descritpion = description
         self.product_feature_id = product_feature_id
-        self.product_feature_value = product_feature_value,
+        self.product_feature_value_id = product_feature_value_id,
 
     def to_dict(self):
         """
@@ -121,7 +121,7 @@ class Product:
             "category": self.category.id,
             "descritpion": self.descritpion,
             "product_feature_id": self.product_feature_id,
-            "product_feature_value": self.product_feature_value
+            "product_feature_value_id": self.product_feature_value_id
         }
     def to_json(self):
         """
@@ -304,7 +304,7 @@ def create(data):
                 for image in products_data['images']:
                     img.append("../"+image['local_path'])
 
-                product = Product(id=1, name=product_name, price=products_data['product_price'], img_path=img, category=sub_category, description=products_data['product_description'],product_feature_id=0, product_feature_value=0)
+                product = Product(id=1, name=product_name, price=products_data['product_price'], img_path=img, category=sub_category, description=products_data['product_description'],product_feature_id=0, product_feature_value_id=0)
 
               
                 for name_quality, qualities_data in products_data.get('other_qualities',{}).items():
@@ -323,7 +323,7 @@ def create(data):
                         product_feature_value.send()
                         product_feature_values.append(product_feature_value)  
                 product.product_feature_id = product_feature.id
-                product.product_feature_value = product_feature_value.id
+                product.product_feature_value_id = product_feature_value.id
                 product.send()
                 products.append(product)
                 product.set_image()
