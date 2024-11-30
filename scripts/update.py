@@ -34,7 +34,7 @@ URL_CATEGORIES = f'{API_URL}/categories'
 URL_PRODUCTS = f'{API_URL}/products'
 
 API_KEY = os.environ.get("PRESTASHOP_KEY") # you can hardcode your api_key 
-API_KEY = "Y8QUQYAVU8W5P2NNQ8S6IHYC7KNE351U"
+API_KEY = "4JUYGWQ4HJ5IEXCFG9GAQIQ5PIQSNSE2"
 
 env = Environment(loader=FileSystemLoader(TEMPLATE_DIR), autoescape=True)
 auth = requests.auth.HTTPBasicAuth(API_KEY, "")
