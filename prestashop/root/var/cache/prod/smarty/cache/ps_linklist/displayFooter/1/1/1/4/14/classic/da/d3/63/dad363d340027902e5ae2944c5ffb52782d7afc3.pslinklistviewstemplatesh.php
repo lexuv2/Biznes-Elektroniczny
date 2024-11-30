@@ -1,30 +1,30 @@
 <?php
-/* Smarty version 3.1.43, created on 2024-11-21 23:17:33
+/* Smarty version 3.1.43, created on 2024-11-30 13:06:40
   from 'module:pslinklistviewstemplatesh' */
 
 /* @var Smarty_Internal_Template $_smarty_tpl */
 if ($_smarty_tpl->_decodeProperties($_smarty_tpl, array (
   'version' => '3.1.43',
-  'unifunc' => 'content_673fb17d5060f2_44039086',
+  'unifunc' => 'content_674affd0d3afc7_75914007',
   'has_nocache_code' => false,
   'file_dependency' => 
   array (
     '906548e89c8c6025457ddaeffb1980a0c743b872' => 
     array (
       0 => 'module:pslinklistviewstemplatesh',
-      1 => 1732226170,
+      1 => 1732961290,
       2 => 'module',
     ),
   ),
   'cache_lifetime' => 31536000,
 ),true)) {
-function content_673fb17d5060f2_44039086 (Smarty_Internal_Template $_smarty_tpl) {
+function content_674affd0d3afc7_75914007 (Smarty_Internal_Template $_smarty_tpl) {
 $_smarty_tpl->smarty->ext->_tplFunction->registerTplFunctions($_smarty_tpl, array (
   'renderLogo' => 
   array (
     'compiled_filepath' => '/var/www/html/var/cache/prod/smarty/compile/classiclayouts_layout_full_width_tpl/d2/2d/85/d22d851f6d7c12eb35c1c34c8e84baa801a8cea2_2.file.helpers.tpl.php',
     'uid' => 'd22d851f6d7c12eb35c1c34c8e84baa801a8cea2',
-    'call_name' => 'smarty_template_function_renderLogo_745774179673fb17d3a6a51_74564101',
+    'call_name' => 'smarty_template_function_renderLogo_1960750753674af47d8c2f06_62656864',
   ),
 ));
 ?><div class="col-md-6 links">
@@ -89,50 +89,50 @@ $_smarty_tpl->smarty->ext->_tplFunction->registerTplFunctions($_smarty_tpl, arra
             <a
                 id="link-cms-page-1-2"
                 class="cms-page-link"
-                href="https://127.0.0.1/content/1-delivery"
-                title="Our terms and conditions of delivery"
+                href="https://127.0.0.1/content/1-dostawy"
+                title="Zasady dotyczące dostaw"
                             >
-              Delivery
+              Dostawy
             </a>
           </li>
                   <li>
             <a
                 id="link-cms-page-2-2"
                 class="cms-page-link"
-                href="https://127.0.0.1/content/2-legal-notice"
-                title="Legal notice"
+                href="https://127.0.0.1/content/2-informacje-prawne"
+                title="informacje prawne sklepu wloczki3"
                             >
-              Legal Notice
+              Informacje prawne
             </a>
           </li>
                   <li>
             <a
                 id="link-cms-page-3-2"
                 class="cms-page-link"
-                href="https://127.0.0.1/content/3-terms-and-conditions-of-use"
-                title="Our terms and conditions of use"
+                href="https://127.0.0.1/content/3-zasady-korzystania"
+                title="Zasady korzystania ze sklepu włóczki3"
                             >
-              Terms and conditions of use
+              Zasady korzystania
             </a>
           </li>
                   <li>
             <a
                 id="link-cms-page-4-2"
                 class="cms-page-link"
-                href="https://127.0.0.1/content/4-about-us"
-                title="Learn more about us"
+                href="https://127.0.0.1/content/4-o-nas"
+                title="o nas"
                             >
-              About us
+              O nas
             </a>
           </li>
                   <li>
             <a
                 id="link-cms-page-5-2"
                 class="cms-page-link"
-                href="https://127.0.0.1/content/5-secure-payment"
-                title="Our secure payment method"
+                href="https://127.0.0.1/content/5-bezpieczne-platnosci"
+                title="Bezpieczne płatności sklepu wloczki3"
                             >
-              Secure payment
+              Bezpieczne płatności
             </a>
           </li>
                   <li>
@@ -143,26 +143,6 @@ $_smarty_tpl->smarty->ext->_tplFunction->registerTplFunctions($_smarty_tpl, arra
                 title="Skorzystaj z formularza kontaktowego"
                             >
               Kontakt z nami
-            </a>
-          </li>
-                  <li>
-            <a
-                id="link-static-page-sitemap-2"
-                class="cms-page-link"
-                href="https://127.0.0.1/Mapa strony"
-                title="Zagubiłeś się? Znajdź to, czego szukasz!"
-                            >
-              Mapa strony
-            </a>
-          </li>
-                  <li>
-            <a
-                id="link-static-page-stores-2"
-                class="cms-page-link"
-                href="https://127.0.0.1/nasze-sklepy"
-                title=""
-                            >
-              Sklepy
             </a>
           </li>
               </ul>
