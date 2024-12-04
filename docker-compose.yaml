@@ -2,7 +2,7 @@ services:
   mariadb:
     container_name: mariadb
     volumes:
-      - ./prestashop/db:/var/lib/mysql
+      - ./prestashop/db:/var/lib/mysql:z
     image: mariadb:latest
     restart: unless-stopped
     environment:
@@ -15,7 +15,7 @@ services:
     container_name: prestashop
     image: prestashop/prestashop:1.7.8.7-fpm
     volumes:
-      - ./prestashop/root:/var/www/html
+      - ./prestashop/root:/var/www/html:z
     restart: unless-stopped
     depends_on:
       - mariadb
@@ -40,10 +40,10 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - ./prestashop/root:/var/www/html
-      - pmadata:/var/www/html/phpmyadmin
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./certs/:/certs
+      - ./prestashop/root:/var/www/html:z
+      - pmadata:/var/www/html/phpmyadmin:z
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:z
+      - ./certs/:/certs:z
     networks:
       - prestashop_network
   phpmyadmin:
@@ -53,7 +53,7 @@ services:
     networks:
       - prestashop_network
     volumes:
-      - pmadata:/var/www/html
+      - pmadata:/var/www/html:z
     environment:
       PMA_HOST: mariadb
 

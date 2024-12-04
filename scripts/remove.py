@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 API_URL = "https://127.0.0.1/api"
-API_KEY = "L382DZUQQJBLEU9CF6S6TIEH8HVHYBQJ"
+API_KEY = "4JUYGWQ4HJ5IEXCFG9GAQIQ5PIQSNSE2"
 
 if not API_KEY:
     raise ValueError("Please set the PRESTASHOP_KEY environment variable.")

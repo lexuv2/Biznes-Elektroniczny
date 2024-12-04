@@ -1,2 +1,2 @@
 0
-a:0:{}
+a:1:{s:19:"ps_featuredproducts";a:2:{s:10:"attributes";a:9:{s:4:"name";s:19:"ps_featuredproducts";s:11:"displayName";s:17:"Produkty polecane";s:11:"description";s:112:"Wybierz kategorię i wyróżnij jej pozycje, popraw customer experience dzięki uaktualnianej stronie głównej.";s:6:"author";s:10:"PrestaShop";s:17:"limited_countries";a:0:{}s:13:"need_instance";i:0;s:12:"parent_class";s:6:"Module";s:16:"is_paymentModule";b:0;s:15:"is_configurable";i:1;}s:4:"disk";a:5:{s:9:"filemtime";i:1733345477;s:10:"is_present";i:1;s:8:"is_valid";i:1;s:7:"version";s:5:"2.1.5";s:4:"path";s:41:"/var/www/html/modules/ps_featuredproducts";}}}
