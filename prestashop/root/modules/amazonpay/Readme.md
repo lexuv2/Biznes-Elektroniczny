@@ -1,1 +1,0 @@
-# Amazon Pay V2
