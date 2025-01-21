@@ -8,6 +8,15 @@ services:
     networks:
       - be_193264_prestashop_network
       - admin-mysql_default
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 64M
+      
   web:
     image: nginx:latest
     depends_on:
